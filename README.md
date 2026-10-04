@@ -38,6 +38,8 @@ x  y   expected x^y
 | `hard_pow_0_1_small.txt` | 87 | hardest first | evenly graded over the whole difficulty range of the full file |
 | `hard_pow_wide_y_1000000.txt` | 1,171,493 | largest result first (see below) | arguments span many binades (x from about 1e-304 to 1e304, second argument up to 1e6) while the result stays in the normal range; most cases are within 2^-4 ulp of a rounding boundary |
 | `hard_pow_wide_y_1000000_small.txt` | 72 | largest result first (see below) | evenly graded over both the magnitude of the result and the distance to the rounding boundary |
+| `hard_sin_0_1.txt` | 1,009,124 | hardest first | almost every case has the exact result within 2^-12 ulp of a rounding boundary |
+| `hard_sin_0_1_small.txt` | 95 | hardest first | evenly graded over the whole difficulty range of the full file |
 
 The file names record the argument range.  `_0_1` means both arguments are
 taken from the open interval (0,1); `_wide_y_1000000` means the arguments cover
