@@ -36,14 +36,23 @@ x  y   expected x^y
 |---|---|---|---|
 | `hard_pow_0_1.txt` | 1,029,956 | hardest first | almost every case has the exact result within 2^-11 ulp of a rounding boundary |
 | `hard_pow_0_1_small.txt` | 87 | hardest first | evenly graded over the whole difficulty range of the full file |
+| `hard_pow_wide_y_1000000.txt` | 1,171,493 | largest result first (see below) | arguments span many binades (x from about 1e-304 to 1e304, second argument up to 1e6) while the result stays in the normal range; most cases are within 2^-4 ulp of a rounding boundary |
+| `hard_pow_wide_y_1000000_small.txt` | 72 | largest result first (see below) | evenly graded over both the magnitude of the result and the distance to the rounding boundary |
 
-The `_0_1` suffix records the argument range: both arguments are taken from the
-open interval (0,1).
+The file names record the argument range.  `_0_1` means both arguments are
+taken from the open interval (0,1); `_wide_y_1000000` means the arguments cover
+a wide range, with the second argument up to 10^6.
 
 A case is the harder the closer its exact result sits to a **rounding
 boundary**, that is, to the midpoint between the two consecutive floating-point
-numbers that surround it.  Both files are sorted so that the hardest cases come
-first.
+numbers that surround it.  Both `_0_1` files are sorted so that the hardest
+cases come first.
+
+In a wide argument range there is a second, independent difficulty axis: the
+magnitude of the result, |y log x|, which is what makes an implementation lose
+accuracy once the arguments get large.  The two `wide` files are therefore
+ordered by that axis first (largest result first), and by the distance to the
+rounding boundary inside it.
 
 ## Using the files
 
