@@ -42,11 +42,13 @@ x  y   expected x^y
 | `hard_sin_0_1_small.txt` | 95 | hardest first | evenly graded over the whole difficulty range of the full file |
 | `hard_sin_wide.txt` | 1,000,126 | largest argument first (see below) | the argument `\|x\|` spans the whole binary64 range, from 1 up to about 1e308, so this is where the argument reduction is tested; most cases are within 2^-12 ulp of a rounding boundary, the deepest one within 2^-34 ulp |
 | `hard_sin_wide_small.txt` | 100 | smallest argument first (see below) | 16 steps of 2^64 in `\|x\|`, the same number of cases from every step, and the hardest case of each step among them |
+| `hard_cos_0_1.txt` | 1,005,949 | hardest first | almost every case has the exact result within 2^-12 ulp of a rounding boundary |
+| `hard_cos_0_1_small.txt` | 92 | hardest first | evenly graded over the whole difficulty range of the full file |
 | `hard_cbrt.txt` | 1,000,011 | hardest first | the argument covers the whole binary64 range with both signs, so it exercises the full exponent and sign space; most cases are within 2^-12 ulp of a rounding boundary, the deepest one within 2^-40 ulp |
 | `hard_cbrt_small.txt` | 97 | hardest first | evenly graded over the whole hardness range of the full file: the same number of cases on every level k, from k=11 up to the deepest level the full file reaches (see below) |
 | `hard_pow_dyadic_small.txt` | 301 | hardest first | `y` takes 14 dyadic values (2, 3, 4, 5, 8, -1, -2, -3, 0.5, 0.25, 0.125, 1.5, -0.5, -1.5) and `x` covers the whole binary64 range with both signs; every case has the exact result within 2^-17 ulp of a rounding boundary, the deepest within 2^-28 ulp, and the cases are evenly graded over that whole range |
 
-The file names record the argument range.  `_0_1` means both arguments are
+The file names record the argument range.  `_0_1` means the arguments are
 taken from the open interval (0,1); `_wide_y_1000000` means the arguments cover
 a wide range, with the second argument up to 10^6; `_wide` in a `sin` file
 means the argument covers the whole binary64 range; `hard_cbrt.txt` likewise
@@ -58,7 +60,7 @@ graded set.
 
 A case is the harder the closer its exact result sits to a **rounding
 boundary**, that is, to the midpoint between the two consecutive floating-point
-numbers that surround it.  The two `_0_1` files, `hard_cbrt.txt` and
+numbers that surround it.  The three `_0_1` files, `hard_cbrt.txt` and
 `hard_pow_dyadic_small.txt` are sorted so that the hardest cases come first.
 
 In a wide argument range there is a second, independent difficulty axis: the
