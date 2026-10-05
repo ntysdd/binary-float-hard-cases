@@ -41,21 +41,25 @@ x  y   expected x^y
 | `hard_sin_0_1.txt` | 1,009,124 | hardest first | almost every case has the exact result within 2^-12 ulp of a rounding boundary |
 | `hard_sin_0_1_small.txt` | 95 | hardest first | evenly graded over the whole difficulty range of the full file |
 | `hard_sin_wide.txt` | 1,000,126 | largest argument first (see below) | the argument `\|x\|` spans the whole binary64 range, from 1 up to about 1e308, so this is where the argument reduction is tested; most cases are within 2^-12 ulp of a rounding boundary, the deepest one within 2^-34 ulp |
-| `hard_sin_wide_small.txt` | 100 | magnitude ladder (see below) | 16 steps of 2^64 in `\|x\|`, the same number of cases from every step, and the hardest case of each step among them |
+| `hard_sin_wide_small.txt` | 100 | smallest argument first (see below) | 16 steps of 2^64 in `\|x\|`, the same number of cases from every step, and the hardest case of each step among them |
 | `hard_cbrt.txt` | 1,000,011 | hardest first | the argument covers the whole binary64 range with both signs, so it exercises the full exponent and sign space; most cases are within 2^-12 ulp of a rounding boundary, the deepest one within 2^-40 ulp |
 | `hard_cbrt_small.txt` | 97 | hardest first | evenly graded over the whole hardness range of the full file: the same number of cases on every level k, from k=11 up to the deepest level the full file reaches (see below) |
+| `hard_pow_dyadic_small.txt` | 301 | hardest first | `y` takes 14 dyadic values (2, 3, 4, 5, 8, -1, -2, -3, 0.5, 0.25, 0.125, 1.5, -0.5, -1.5) and `x` covers the whole binary64 range with both signs; every case has the exact result within 2^-17 ulp of a rounding boundary, the deepest within 2^-28 ulp, and the cases are evenly graded over that whole range |
 
 The file names record the argument range.  `_0_1` means both arguments are
 taken from the open interval (0,1); `_wide_y_1000000` means the arguments cover
 a wide range, with the second argument up to 10^6; `_wide` in a `sin` file
 means the argument covers the whole binary64 range; `hard_cbrt.txt` likewise
 covers the whole binary64 range, but as its own file name says nothing about
-the range, it is documented here.
+the range, it is documented here; and `hard_pow_dyadic_small.txt` keeps `y` on a
+fixed list of dyadic values while `x` ranges over the whole binary64 range with
+both signs.  That last file has no full-size counterpart: it is itself the
+graded set.
 
 A case is the harder the closer its exact result sits to a **rounding
 boundary**, that is, to the midpoint between the two consecutive floating-point
-numbers that surround it.  The two `_0_1` files and `hard_cbrt.txt` are sorted
-so that the hardest cases come first.
+numbers that surround it.  The two `_0_1` files, `hard_cbrt.txt` and
+`hard_pow_dyadic_small.txt` are sorted so that the hardest cases come first.
 
 In a wide argument range there is a second, independent difficulty axis: the
 magnitude of the result, |y log x|, which is what makes an implementation lose
@@ -71,10 +75,10 @@ full `hard_sin_wide.txt` is ordered by that axis first and by the distance to
 the rounding boundary inside it: the largest `|x|` comes first (the file opens
 at the top binary exponent and works its way down), and within one exponent the
 cases closest to a rounding boundary come first, so the first block of lines is
-always the hardest portion of that magnitude.  The small file is the same idea
-as a coarse **magnitude ladder**, run the other way: `|x|` is cut into steps of
-2^64 and the file starts at the *small* end, every step contributes the same
-number of cases, and inside a step the hardest cases come first.  Read from top
+always the hardest portion of that magnitude.  The small file does the same thing more coarsely and the other way round: `|x|`
+is cut into steps of 2^64, the file starts at the *small* end, every step
+contributes the same number of cases, and inside a step the hardest cases come
+first.  Read from top
 to bottom, a library that goes wrong from some argument magnitude onwards goes
 wrong from some line onwards, which is what makes the small file useful for
 locating the break rather than just detecting it.
@@ -83,10 +87,17 @@ The cube root has no such second axis.  `cbrt` is exactly scale covariant:
 `cbrt(2^(3e) * x) == 2^e * cbrt(x)` holds in binary64, so the hardness of a case
 depends only on the mantissa and on the exponent modulo 3, never on the
 magnitude.  `hard_cbrt.txt` still covers the whole binary64 range and both
-signs, but it is ordered by the distance to the rounding boundary alone, and its
-small file is a plain hardness ladder rather than a magnitude ladder.  The same
+signs, but it is ordered by the distance to the rounding boundary alone, and in
+its small file every level of difficulty contributes about the same number of
+cases.  The same
 scale covariance is the reason this function needs no `wide` variant: a handful
 of binades would have produced the same difficulty distribution.
+
+`hard_pow_dyadic_small.txt` varies `x` over the whole binary64 range, with both
+signs, while `y` comes from a fixed list of dyadic values.  The cases are
+ordered by how close the exact result comes to a rounding boundary, and every
+level from k=16 up to k=27 contributes about the same number of them, so an
+implementation can be graded simply by how far down the file it stays correct.
 
 ## Using the files
 
