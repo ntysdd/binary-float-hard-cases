@@ -40,28 +40,47 @@ x  y   expected x^y
 | `hard_pow_wide_y_1000000_small.txt` | 72 | largest result first (see below) | evenly graded over both the magnitude of the result and the distance to the rounding boundary |
 | `hard_sin_0_1.txt` | 1,009,124 | hardest first | almost every case has the exact result within 2^-12 ulp of a rounding boundary |
 | `hard_sin_0_1_small.txt` | 95 | hardest first | evenly graded over the whole difficulty range of the full file |
+| `hard_sin_wide.txt` | 1,000,126 | largest argument first (see below) | the argument `\|x\|` spans the whole binary64 range, from 1 up to about 1e308, so this is where the argument reduction is tested; most cases are within 2^-12 ulp of a rounding boundary, the deepest one within 2^-34 ulp |
+| `hard_sin_wide_small.txt` | 100 | magnitude ladder (see below) | 16 steps of 2^64 in `\|x\|`, the same number of cases from every step, and the hardest case of each step among them |
 
 The file names record the argument range.  `_0_1` means both arguments are
 taken from the open interval (0,1); `_wide_y_1000000` means the arguments cover
-a wide range, with the second argument up to 10^6.
+a wide range, with the second argument up to 10^6; `_wide` in a `sin` file
+means the argument covers the whole binary64 range.
 
 A case is the harder the closer its exact result sits to a **rounding
 boundary**, that is, to the midpoint between the two consecutive floating-point
-numbers that surround it.  Both `_0_1` files are sorted so that the hardest
+numbers that surround it.  The two `_0_1` files are sorted so that the hardest
 cases come first.
 
 In a wide argument range there is a second, independent difficulty axis: the
 magnitude of the result, |y log x|, which is what makes an implementation lose
-accuracy once the arguments get large.  The two `wide` files are therefore
-ordered by that axis first (largest result first), and by the distance to the
-rounding boundary inside it.
+accuracy once the arguments get large.  The two `hard_pow_wide_y_1000000`
+files are therefore ordered by that axis first (largest result first), and by
+the distance to the rounding boundary inside it.
+
+For the sine the corresponding axis is the magnitude of the **argument**
+itself: reducing sin(x) needs about log2|x| extra bits of pi, so a library
+whose reduction carries only a few dozen bits of pi is wrong on a large
+fraction of the arguments here, usually by an enormous number of ulps.  The
+full `hard_sin_wide.txt` is ordered by that axis first and by the distance to
+the rounding boundary inside it: the largest `|x|` comes first (the file opens
+at the top binary exponent and works its way down), and within one exponent the
+cases closest to a rounding boundary come first, so the first block of lines is
+always the hardest portion of that magnitude.  The small file is the same idea
+as a coarse **magnitude ladder**, run the other way: `|x|` is cut into steps of
+2^64 and the file starts at the *small* end, every step contributes the same
+number of cases, and inside a step the hardest cases come first.  Read from top
+to bottom, a library that goes wrong from some argument magnitude onwards goes
+wrong from some line onwards, which is what makes the small file useful for
+locating the break rather than just detecting it.
 
 ## Using the files
 
 ```c
 /* pseudocode */
-for each line (x, y, expected) of the file:
-    got = my_func(x, y);
+for each line (arguments..., expected) of the file:
+    got = my_func(arguments...);
     if (memcmp(&got, &expected, 8) != 0)
         report a mismatch (optionally: how many ulps off)
 ```
