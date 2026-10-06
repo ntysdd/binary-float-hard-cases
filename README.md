@@ -46,14 +46,18 @@ x  y   expected x^y
 | `hard_cos_0_1_small.txt` | 92 | hardest first | evenly graded over the whole difficulty range of the full file |
 | `hard_cos_wide.txt` | 1,000,035 | largest argument first (see below) | the argument `\|x\|` spans the whole binary64 range with both signs, so this is where the argument reduction is tested; most cases are within 2^-12 ulp of a rounding boundary, the deepest one within 2^-31 ulp |
 | `hard_cos_wide_small.txt` | 100 | smallest argument first (see below) | 16 steps of 2^64 in `\|x\|`, the same number of cases from every step, and the hardest case of each step among them |
+| `hard_tan_0_1.txt` | 1,000,504 | hardest first | almost every case has the exact result within 2^-12 ulp of a rounding boundary |
+| `hard_tan_0_1_small.txt` | 99 | hardest first | evenly graded over the whole difficulty range of the full file |
+| `hard_tan_wide.txt` | 1,000,019 | largest argument first (see below) | the argument `\|x\|` spans the whole binary64 range with both signs, so this is where the argument reduction is tested; most cases are within 2^-12 ulp of a rounding boundary, the deepest one within 2^-32 ulp |
+| `hard_tan_wide_small.txt` | 100 | smallest argument first (see below) | 16 steps of 2^64 in `\|x\|`, the same number of cases from every step, and the hardest case of each step among them |
 | `hard_cbrt.txt` | 1,000,011 | hardest first | the argument covers the whole binary64 range with both signs, so it exercises the full exponent and sign space; most cases are within 2^-12 ulp of a rounding boundary, the deepest one within 2^-40 ulp |
 | `hard_cbrt_small.txt` | 97 | hardest first | evenly graded over the whole hardness range of the full file: the same number of cases on every level k, from k=11 up to the deepest level the full file reaches (see below) |
 | `hard_pow_dyadic_small.txt` | 301 | hardest first | `y` takes 14 dyadic values (2, 3, 4, 5, 8, -1, -2, -3, 0.5, 0.25, 0.125, 1.5, -0.5, -1.5) and `x` covers the whole binary64 range with both signs; every case has the exact result within 2^-17 ulp of a rounding boundary, the deepest within 2^-28 ulp, and the cases are evenly graded over that whole range |
 
 The file names record the argument range.  `_0_1` means the arguments are
 taken from the open interval (0,1); `_wide_y_1000000` means the arguments cover
-a wide range, with the second argument up to 10^6; `_wide` in a `sin` or `cos`
-file means the argument covers the whole binary64 range; `hard_cbrt.txt` likewise
+a wide range, with the second argument up to 10^6; `_wide` in a `sin`, `cos` or
+`tan` file means the argument covers the whole binary64 range; `hard_cbrt.txt` likewise
 covers the whole binary64 range, but as its own file name says nothing about
 the range, it is documented here; and `hard_pow_dyadic_small.txt` keeps `y` on a
 fixed list of dyadic values while `x` ranges over the whole binary64 range with
@@ -62,7 +66,7 @@ graded set.
 
 A case is the harder the closer its exact result sits to a **rounding
 boundary**, that is, to the midpoint between the two consecutive floating-point
-numbers that surround it.  The three `_0_1` files, `hard_cbrt.txt` and
+numbers that surround it.  The four `_0_1` files, `hard_cbrt.txt` and
 `hard_pow_dyadic_small.txt` are sorted so that the hardest cases come first.
 
 In a wide argument range there is a second, independent difficulty axis: the
@@ -71,22 +75,20 @@ accuracy once the arguments get large.  The two `hard_pow_wide_y_1000000`
 files are therefore ordered by that axis first (largest result first), and by
 the distance to the rounding boundary inside it.
 
-For the sine and the cosine the corresponding axis is the magnitude of the
-**argument** itself: reducing sin(x) or cos(x) needs about log2|x| extra bits
-of pi, so a library
-whose reduction carries only a few dozen bits of pi is wrong on a large
-fraction of the arguments here, usually by an enormous number of ulps.  The
-full `hard_sin_wide.txt` and `hard_cos_wide.txt` are ordered by that axis first
-and by the distance to
+The corresponding axis for the sine, the cosine and the tangent is the
+magnitude of the **argument** itself: reducing sin(x), cos(x) or tan(x) needs
+about log2|x| extra bits of pi, so a library whose reduction carries only a few
+dozen bits of pi is wrong on a large fraction of the arguments here, usually by
+an enormous number of ulps.  The full `hard_sin_wide.txt`, `hard_cos_wide.txt`
+and `hard_tan_wide.txt` are ordered by that axis first and by the distance to
 the rounding boundary inside it: the largest `|x|` comes first (the file opens
 at the top binary exponent and works its way down), and within one exponent the
 cases closest to a rounding boundary come first, so the first block of lines is
-always the hardest portion of that magnitude.  The two small files do the same
-thing more coarsely and the other way round: `|x|`
-is cut into steps of 2^64, the file starts at the *small* end, every step
-contributes the same number of cases, and inside a step the hardest cases come
-first.  Read from top
-to bottom, a library that goes wrong from some argument magnitude onwards goes
+always the hardest portion of that magnitude.  The three small files do the
+same thing more coarsely and the other way round: `|x|` is cut into steps of
+2^64, the file starts at the *small* end, every step contributes the same number
+of cases, and inside a step the hardest cases come first.  Read from top to
+bottom, a library that goes wrong from some argument magnitude onwards goes
 wrong from some line onwards, which is what makes the small files useful for
 locating the break rather than just detecting it.
 
@@ -128,9 +130,7 @@ What the results tell you:
   half an ulp on a substantial fraction of inputs.
 
 For reference, mainstream libm implementations disagree with the correctly
-rounded result on roughly 30 % of the cases in `hard_pow_0_1.txt`, and the C
-library of the machine these files were generated on disagrees on about 50 % of
-the cases in `hard_cos_0_1.txt`.
+rounded result on roughly 30 % of the cases in `hard_pow_0_1.txt`.
 
 Directed rounding modes are not covered by these files: `expected` is always
 the round-to-nearest (ties-to-even) result.
